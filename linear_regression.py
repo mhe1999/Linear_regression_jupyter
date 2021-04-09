@@ -148,6 +148,13 @@ def linear_regression(dataset,inital_theta, itteration = 1500, alpha = 0.01, FN=
         cost_save= np.append(cost_save, cost)
     return cost_save, theta, X_mu, X_sigma
 
+def predict(X, theta, mu, sigma):
+    m = X.shape[0]
+    X_norm = (X - mu) / sigma
+    X_norm = np.append(np.zeros((m,1)) + 1, X_norm, axis = 1)
+    yhat = np.dot(X_norm, theta)
+    return yhat
+
 if __name__ == '__main__':
 
     data_all = load_data()
