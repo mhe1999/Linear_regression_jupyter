@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from math import floor
 
 def load_data(path = "linearRegression_carPrice.csv"):
     data = pd.read_csv(path)
@@ -47,7 +48,23 @@ def oneHat_encoder(dataset):
             output = np.append(output, temp, axis=1)
     return output
 
+def partition_data(dataset,train_percent = 0.6, CV_percent = 0.2, test_percent = 0.2):
+    m = dataset.shape[0]
+    train_number = floor(train_percent * m)
+    CV_number = floor(CV_percent * m)
+    test_number = floor(test_percent * m)
+    # print(type(dataset))
+    train_data = dataset[0:train_number, :]
+    CV_data = dataset[train_number:CV_number+train_number, :]
+    test_data = dataset[CV_number+train_number:, :]
 
-dataset = np.array([[1,"A", "Aa", 10], [2,"B", "Bb", 20], [3,"C", "Cc", 30]], dtype=object)
-print(int_encoder(dataset))
-print(oneHat_encoder(dataset))
+    return train_data, CV_data, test_data
+
+if __name__ == '__main__':
+    # dataset = np.array([[1,"A", "Aa", 10], [2,"B", "Bb", 20], [3,"C", "Cc", 30]], dtype=object)
+    # print(int_encoder(dataset))
+    # print(oneHat_encoder(dataset))
+
+    dataset = load_data()
+    train_data, CV_data, test_data = partition_data(dataset)
+    print (CV_data, CV_data.shape)
