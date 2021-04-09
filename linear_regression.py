@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from math import floor
+import matplotlib.pyplot as plt
 
 def load_data(path = "linearRegression_carPrice.csv"):
     data = pd.read_csv(path)
@@ -64,29 +65,97 @@ def compute_cost(X, y, theta):
     m = X.shape[0]
     yhat = np.dot(X, theta)
     lost = np.power(yhat- y, 2)
-    cost = 1/m * np.sum(lost)
+    cost = 1/(2*m) * np.sum(lost)
     # print(cost)
     return cost
 
 def cal_gradients(X, y, theta):
     m = X.shape[0]
     yhat = np.dot(X, theta)
+    # print("yhat:", yhat)
     gradients = 1/m * np.dot(X.T,(yhat - y))
+    # print("gradiants:", gradients)
+    # print("\n\n\ny:",y.shape)
+    # print("yhat:", yhat.shape)
+    # print("minese:" ,(yhat - y). shape)
+    # print("gradient:",gradients.shape)
     return gradients
 
-def one_variable_linear_regression(dataset,inital_theta, itteration = 1500, alpha = 0.01):
+def update_parameters(gradients, theta, alpha):
+    theta = theta - alpha * gradients
+    return theta
+
+def feature_normalization(X):
+    X_norm = X;
+    mu = np.zeros((1, X.shape[1]));
+    sigma = np.zeros((1, X.shape[1]));
+    for i in range(X.shape[1]):
+        mu[0,i] = np.mean(X[:, i])
+        sigma[0,i] = np.std(X[:, i])
+    X_norm = (X - mu) / sigma
+    return X_norm, mu, sigma
+
+
+def one_variable_linear_regression(dataset,inital_theta, itteration = 1500, alpha = 0.01, FN=0):
     assert dataset.shape[1] == 2
-
-    X = np.append(np.zeros((m,1)) + 1, dataset[:, 0], axis = 1) # add x0
-    y = dataset[:,1]
+    m = dataset.shape[0]
+    # print("m:", m)
+    theta = inital_theta
+    X = np.reshape(dataset[:, 0],(-1,1))
+    if FN == 1:
+         X, X_mu, X_sigma = feature_normalization(X)
+    X = np.append(np.zeros((m,1)) + 1, X, axis = 1) # add x0
+    y = np.reshape(dataset[:,1], (-1,1))
+    # X_norm, X_mu, X_sigma = feature_normalization(X)
+    # X_norm, X_mu, X_sigma = feature_normalization(X)
+    # print("X:",X)
+    # print("y:",y)
+    # print("theta:",theta.shape)
     # thata = np.zeros((2,1))
-
+    cost_save = np.array([])
+    for i in range(itteration):
+        gradients = cal_gradients(X, y, theta)
+        theta = update_parameters(gradients, theta, alpha)
+        cost = compute_cost(X, y, theta)
+        # print("gradiants:")
+        # print(gradients)
+        # print("\ntheta:")
+        # print(theta)
+        # print("\ncost:")
+        print(cost)
+        cost_save= np.append(cost_save, cost)
+    return cost_save, theta
 
 if __name__ == '__main__':
     # dataset = np.array([[1,"A", "Aa", 10], [2,"B", "Bb", 20], [3,"C", "Cc", 30]], dtype=object)
     # print(int_encoder(dataset))
     # print(oneHat_encoder(dataset))
 
-    dataset = load_data()
-    train_data, CV_data, test_data = partition_data(dataset)
-    print (CV_data, CV_data.shape)
+    data_all = load_data()
+    # train_data, CV_data, test_data = partition_data(dataset)
+    # single
+    # train_data = dataset
+    dataset = np.append(np.reshape(data_all[:, 21], (-1,1)), np.reshape(data_all[:, 25], (-1,1)), axis=1)
+    # print(sv_dataset)
+    # print (CV_data, CV_data.shape)
+    theta = np.zeros((2,1))
+    # theta[0][0] = 5613
+    # theta[1][0] = 187
+    c, t= one_variable_linear_regression(dataset, theta, 100, 0.00001)
+    # print(t)
+    # plt.plot(train_data[:, 21], train_data[:, 25], 'o')
+    # plt.plot(c)
+    # x1 = 5
+    # y1 = t[0] + x1 * t[1]
+    # x2 = 400
+    # y2 = t[0] + x2 * t[1]
+    # print(y1)
+    # print(y2)
+    # x1, y1 = [5, 12], [1, 4]
+    # x2, y2 = [1, 10], [3, 2]
+    # plt.plot(x1,y1,x2,y2, marker='o')
+    plt.plot(data_all[:, 21],data_all[:, 25], 'yo', data_all[:, 21], t[0] + data_all[:, 21] * t[1], '--k')
+
+    plt.show()
+    plt.plot(c)
+    plt.show()
