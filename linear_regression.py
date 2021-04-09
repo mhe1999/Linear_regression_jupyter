@@ -68,6 +68,11 @@ def compute_cost(X, y, theta):
     # print(cost)
     return cost
 
+def cal_gradients(X, y, theta):
+    m = X.shape[0]
+    yhat = np.dot(X, theta)
+    gradients = 1/m * np.dot(X.T,(yhat - y))
+    return gradients
 
 def one_variable_linear_regression(dataset,inital_theta, itteration = 1500, alpha = 0.01):
     assert dataset.shape[1] == 2
