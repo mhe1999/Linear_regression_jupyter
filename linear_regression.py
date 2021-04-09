@@ -60,6 +60,23 @@ def partition_data(dataset,train_percent = 0.6, CV_percent = 0.2, test_percent =
 
     return train_data, CV_data, test_data
 
+def compute_cost(X, y, theta):
+    m = X.shape[0]
+    yhat = np.dot(X, theta)
+    lost = np.power(yhat- y, 2)
+    cost = 1/m * np.sum(lost)
+    # print(cost)
+    return cost
+
+
+def one_variable_linear_regression(dataset,inital_theta, itteration = 1500, alpha = 0.01):
+    assert dataset.shape[1] == 2
+
+    X = np.append(np.zeros((m,1)) + 1, dataset[:, 0], axis = 1) # add x0
+    y = dataset[:,1]
+    # thata = np.zeros((2,1))
+
+
 if __name__ == '__main__':
     # dataset = np.array([[1,"A", "Aa", 10], [2,"B", "Bb", 20], [3,"C", "Cc", 30]], dtype=object)
     # print(int_encoder(dataset))
