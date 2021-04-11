@@ -144,7 +144,8 @@ def linear_regression(dataset,inital_theta, itteration = 1500, alpha = 0.01, FN=
         gradients = cal_gradients(X, y, theta)
         theta = update_parameters(gradients, theta, alpha)
         cost = compute_cost(X, y, theta)
-        # print(cost)
+        if i % 100 == 0:
+            print(i, cost)
         cost_save= np.append(cost_save, cost)
     return cost_save, theta, X_mu, X_sigma
 
@@ -155,50 +156,66 @@ def predict(X, theta, mu, sigma):
     yhat = np.dot(X_norm, theta)
     return yhat
 
+# def normall(dataset, columns = [4, 14]):
+#     # print(dataset[4,14])
+#     # print(dataset[:,4])
+#     # print(dataset[:,14])
+#     m = dataset.shape[0]
+#     for i in range(len(columns)):
+#         for j in range(m):
+#             # print(j, i)
+#             if dataset[j, columns[i]]== 'two':
+#                 dataset[j, columns[i]] = 2
+#             elif dataset[j, columns[i]]== 'four':
+#                 dataset[j, columns[i]] = 4
+#             elif dataset[j, columns[i]]== 'five':
+#                 dataset[j, columns[i]] = 5
+#             elif dataset[j, columns[i]]== 'six':
+#                 dataset[j, columns[i]] = 6
+#             elif dataset[j, columns[i]]== 'eight':
+#                 dataset[j, columns[i]] = 8
+#             elif dataset[j, columns[i]]== 'three':
+#                 dataset[j, columns[i]] = 3
+#             elif dataset[j, columns[i]]== 'twelve':
+#                 dataset[j, columns[i]] = 12
+#         # print(dataset[:, columns[i]])
+#         return dataset
+
+def draw_predicts(dataset, t, mu, sigma):
+    yhat = predict(dataset[:, 0:-1], t, mu, sigma)
+    plt.plot(np.sort(yhat, axis=0), 'r--')
+    plt.plot(np.sort(np.reshape(dataset[:, -1], (-1,1)), axis=0), 'b--')
+    plt.legend(['predicts', 'real price'])
+    plt.show()
+
+def draw_residual(dataset, t, mu, sigma):
+    yhat = predict(dataset[:, 0:-1], t, mu, sigma)
+    residuals = np.reshape(dataset[:, -1], (-1,1)) - yhat
+    plt.plot(residuals, 'o')
+    plt.show()
+    plt.hist(residuals)
+    plt.show()
+    print("residuals mean error: ", np.mean(residuals))
+
 if __name__ == '__main__':
 
     data_all = load_data()
-    dataset = data_all
-    # dataset = np.append(data_all[:, 18:24], np.reshape(data_all[:, 25], (-1,1)), axis=1)
+    dataset = data_all[:, 1:]
+    # dataset = normall(dataset)
+
     dataset = oneHat_encoder(dataset)
-    # print(dataset)
     train_data, CV_data, test_data = partition_data(dataset,train_percent = 0.999, CV_percent = 0, test_percent = 0.1)
     n = train_data.shape[1]
     theta = np.zeros((n,1))
-    c , t, mu, sigma = linear_regression(train_data, theta, 5000, 0.175)
+    theta = np.loadtxt('data.csv', delimiter=',')
+    theta = np.reshape(theta, (-1,1))
+    c , t, mu, sigma = linear_regression(train_data, theta, 5, 0.17)
+    # np.savetxt('data.csv', t, delimiter=',')
 
     plt.plot(c)
     plt.show()
-
-    # print(train_data[:, 0:-1])
-    yhat = predict(test_data[:, 0:-1], t, mu, sigma)
-    # print(c)
-    print("y:",test_data[:, -1])
-    print("yhat:", yhat)
-
-    # train_data, CV_data, test_data = partition_data(dataset)
-    # single
-    # train_data = dataset
-    # dataset = np.append(np.reshape(data_all[:, 21], (-1,1)), np.reshape(data_all[:, 25], (-1,1)), axis=1)
-    # print(sv_dataset)
-    # print (CV_data, CV_data.shape)
-    # theta = np.zeros((2,1))
-    # theta[0][0] = 5613
-    # theta[1][0] = 187
-    # c, t= one_variable_linear_regression(dataset, theta, 100, 0.00001)
-    # print(t)
-    # plt.plot(train_data[:, 21], train_data[:, 25], 'o')
-    # plt.plot(c)
-    # x1 = 5
-    # y1 = t[0] + x1 * t[1]
-    # x2 = 400
-    # y2 = t[0] + x2 * t[1]
-    # print(y1)
-    # print(y2)
-    # x1, y1 = [5, 12], [1, 4]
-    # x2, y2 = [1, 10], [3, 2]
-    # plt.plot(x1,y1,x2,y2, marker='o')
-    # plt.plot(data_all[:, 21],data_all[:, 25], 'yo', data_all[:, 21], t[0] + data_all[:, 21] * t[1], '--k')
-    # plt.show()
     # plt.plot(c)
     # plt.show()
+
+    draw_predicts(dataset, t, mu, sigma)
+    draw_residual(dataset, t, mu, sigma)
