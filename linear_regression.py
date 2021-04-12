@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from math import floor
 import matplotlib.pyplot as plt
+# from statsmodels.stats.outliers_influence import variance_inflation_factor
 
 def load_data(path = "linearRegression_carPrice.csv"):
     data = pd.read_csv(path)
@@ -155,31 +156,6 @@ def predict(X, theta, mu, sigma):
     X_norm = np.append(np.zeros((m,1)) + 1, X_norm, axis = 1)
     yhat = np.dot(X_norm, theta)
     return yhat
-
-# def normall(dataset, columns = [4, 14]):
-#     # print(dataset[4,14])
-#     # print(dataset[:,4])
-#     # print(dataset[:,14])
-#     m = dataset.shape[0]
-#     for i in range(len(columns)):
-#         for j in range(m):
-#             # print(j, i)
-#             if dataset[j, columns[i]]== 'two':
-#                 dataset[j, columns[i]] = 2
-#             elif dataset[j, columns[i]]== 'four':
-#                 dataset[j, columns[i]] = 4
-#             elif dataset[j, columns[i]]== 'five':
-#                 dataset[j, columns[i]] = 5
-#             elif dataset[j, columns[i]]== 'six':
-#                 dataset[j, columns[i]] = 6
-#             elif dataset[j, columns[i]]== 'eight':
-#                 dataset[j, columns[i]] = 8
-#             elif dataset[j, columns[i]]== 'three':
-#                 dataset[j, columns[i]] = 3
-#             elif dataset[j, columns[i]]== 'twelve':
-#                 dataset[j, columns[i]] = 12
-#         # print(dataset[:, columns[i]])
-#         return dataset
 
 def draw_predicts(dataset, t, mu, sigma):
     yhat = predict(dataset[:, 0:-1], t, mu, sigma)
