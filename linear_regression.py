@@ -197,6 +197,24 @@ def draw_residual(dataset, t, mu, sigma):
     plt.show()
     print("residuals mean error: ", np.mean(residuals))
 
+def VIF_analysis(path = "LinearRegression_CarPrice.csv"):
+    data = pd.read_csv(path)
+    d = dict()
+    keys = data.keys()
+    for i in keys[:-1]:
+        if not isinstance(data[i][0], str):
+            d[i] = data[i]
+        else:
+            d[i] = pd.factorize(data[i])[0]
+    X = pd.DataFrame(data=d)
+
+    vif_data = pd.DataFrame()
+    vif_data["feature"] = X.columns
+    vif_data["VIF"] = [variance_inflation_factor(X.values, i)
+                              for i in range(len(X.columns))]
+
+    print(vif_data)
+
 if __name__ == '__main__':
 
     data_all = load_data()
@@ -211,11 +229,9 @@ if __name__ == '__main__':
     theta = np.reshape(theta, (-1,1))
     c , t, mu, sigma = linear_regression(train_data, theta, 5, 0.17)
     # np.savetxt('data.csv', t, delimiter=',')
+    print(dataset.shape)
 
     plt.plot(c)
     plt.show()
     # plt.plot(c)
     # plt.show()
-
-    draw_predicts(dataset, t, mu, sigma)
-    draw_residual(dataset, t, mu, sigma)
